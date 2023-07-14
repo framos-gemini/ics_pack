@@ -1,0 +1,14 @@
+ conda activate igos2n
+ pip install pika
+ pip install pytz
+ pip install Pyrebase4
+ STDCXX=MAKE_NPROCS=pip install cppyy==2.4.--verbose cppyy --no-binary=cppyy-cling
+ cd ~/giapi-gluecc/
+ source defineGiapiglueEnv.sh 
+ cd -
+ python $HOME/ics_pack/code/InstSeq/InstSeq.py 
+ mkdir /home/ics/IGRINS/Log/InstSeq
+ mkdir /home/ics/IGRINS/Log
+ mkdir /home/ics/IGRINS/ 
+ vim ~/IGRINS/Config/IGRINS.ini 
+ python $HOME/ics_pack/code/InstSeq/InstSeq.py
