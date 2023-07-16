@@ -80,12 +80,13 @@ class Inst_Seq(threading.Thread):
         self.actRequested = {}
         self.cur_action_id = None
         
-        '''
+        
         self._handler = instDummy.InstCmdHandler.create(self._callback_giapi)
-        giapi.CommandUtil.subscribeSequenceCommand(giapi.command.SequenceCommand.DATUM, giapi.command.ActivitySet.SET_PRESET_START,self._handler)
+        #giapi.CommandUtil.subscribeSequenceCommand(giapi.command.SequenceCommand.DATUM, giapi.command.ActivitySet.SET_PRESET_START,self._handler)
+        #giapi.CommandUtil.subscribeSequenceCommand(giapi.command.SequenceCommand.APPLY, giapi.command.ActivitySet.SET_PRESET_START,self._handler)
         giapi.CommandUtil.subscribeSequenceCommand(giapi.command.SequenceCommand.OBSERVE, giapi.command.ActivitySet.SET_PRESET_START,self._handler)
         print(f'Subscribing APPLY {giapi.CommandUtil.subscribeApply("ig", giapi.command.ActivitySet.SET_PRESET,self._handler)}')
-        '''
+        
                                             
         
     def __del__(self):

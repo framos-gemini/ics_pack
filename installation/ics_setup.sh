@@ -14,9 +14,10 @@ cp -r $HOME/ics_pack/installation/IGRINS $HOME
 
 # install python library
 cd $HOME/ics_pack/installation
-bash Miniconda3-latest-Linux-x86_64.sh
-export PATH=$HOME/miniconda3/bin:$PATH
-source ~/.bash_profile
+# TODO. We should check if the miniconda is already installed before
+#bash Miniconda3-latest-Linux-x86_64.sh
+#export PATH=$HOME/miniconda3/bin:$PATH
+#source ~/.bash_profile
 
 conda update conda
 conda create -n igos2n python=3.9

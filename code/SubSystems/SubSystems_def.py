@@ -18,7 +18,8 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 #import os
 #dir = os.getcwd().split("/")
 #WORKING_DIR = "/" + dir[1] + "/" + dir[2] + "/"
-WORKING_DIR = "/home/ics/"
+#TODO user 
+WORKING_DIR = "/home/vagrant/"
         
 MAIN = "MAIN"
 HK = "HK"

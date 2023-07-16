@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HOME=/home/ics
+HOME=/home/vagrant
 
 PYTHONBIN=$HOME/miniconda3/envs/igos2n/bin/python
 

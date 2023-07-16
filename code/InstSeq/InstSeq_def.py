@@ -14,7 +14,8 @@ Modified on Apr 18, 2023
 #import os
 #dir = os.getcwd().split("/")
 #WORKING_DIR = "/" + dir[1] + "/" + dir[2] + "/"
-WORKING_DIR = "/home/ics/"
+# TODO. change user
+WORKING_DIR = "/home/vagrant/"
 
 MAIN = "MAIN"
 

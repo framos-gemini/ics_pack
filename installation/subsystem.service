@@ -3,7 +3,7 @@ Description=subsystem Service
 
 [Service]
 Type=simple
-ExecStart=/home/ics/ics_pack/installation/run_subsystem.sh
+ExecStart=/home/vagrant/ics_pack/installation/run_subsystem.sh
 
 [Install]
 WantedBy=multi-user.target 
