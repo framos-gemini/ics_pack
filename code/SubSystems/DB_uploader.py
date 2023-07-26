@@ -1,7 +1,7 @@
 """
 ... from uploader.py from IGRINS
 
-Modified on June 30, 2023
+Modified on July 26, 2023
 
 @author: hilee, JJLee
 """
@@ -116,17 +116,10 @@ class uploader(threading.Thread):
         
         self.upload_interval = int(cfg.get(HK, "upload-intv"))
         
-        firebase = self.get_firebase()
-        self.db = firebase.database()
-    
-        #-------
-        #for test
-        #self.start_upload_to_firebase(self.db)
-        #self.log.send(self.iam, INFO, "Uploaded " + ti.strftime("%Y-%m-%d %H:%M:%S"))
-        #-------
-                
         self.simul = strtobool(cfg.get(MAIN, "simulation"))
-        #self.connect_to_server_hk_q()
+
+        firebase = self.get_firebase(self.simul)
+        self.db = firebase.database()
         
         self.producer = None
         self.consumer = [None for _ in range(COM_CNT)]
@@ -154,29 +147,27 @@ class uploader(threading.Thread):
         self.log.send(self.iam, DEBUG, "Closed!")
                                     
 
-    def get_firebase(self):
+    def get_firebase(self, simul):
         
-        config = {
-            "apiKey": "AIzaSyCDUZO9ejB8LzKPtGB0_5xciByJvYI4IzY",
-            "authDomain": "igrins2-hk.firebaseapp.com",
-            "databaseURL": "https://igrins2-hk-default-rtdb.firebaseio.com",
-            "storageBucket": "igrins2-hk.appspot.com",
-            "serviceAccount": WORKING_DIR + "ics_pack/code/igrins2-hk-firebase-adminsdk-qtt3q-073f6caf5b.json"
+        if simul:
+            # for test
+            config = {
+                "apiKey": "AIzaSyDSt_O0KmvB5MjrDXuGJCABAOVNp8Q3ZB8",
+                "authDomain": "hkp-db-37e0f.firebaseapp.com",
+                "databaseURL": "https://hkp-db-37e0f-default-rtdb.firebaseio.com",
+                "storageBucket": "hkp-db-37e0f.appspot.com",
+                "serviceAccount": WORKING_DIR + "ics_pack/code/hkp-db-37e0f-firebase-adminsdk-9r23k-a8a806fcb0.json"
             }
-        
-        '''
-        # for test
-        config={
-            "apiKey": "AIzaSyDSt_O0KmvB5MjrDXuGJCABAOVNp8Q3ZB8",
-            "authDomain": "hkp-db-37e0f.firebaseapp.com",
-            "databaseURL": "https://hkp-db-37e0f-default-rtdb.firebaseio.com",
-            "projectId": "hkp-db-37e0f",
-            "storageBucket": "hkp-db-37e0f.appspot.com",
-            "messagingSenderId": "1059665885507",
-            "appId": "1:1059665885507:web:c4d5dbd322c1c0ff4e17f6",
-            "measurementId": "G-450KS9WJF1"
-        }
-        '''
+        else:
+            config = {
+                "apiKey": "AIzaSyCDUZO9ejB8LzKPtGB0_5xciByJvYI4IzY",
+                "authDomain": "igrins2-hk.firebaseapp.com",
+                "databaseURL": "https://igrins2-hk-default-rtdb.firebaseio.com",
+                "storageBucket": "igrins2-hk.appspot.com",
+                "serviceAccount": WORKING_DIR + "ics_pack/code/igrins2-hk-firebase-adminsdk-qtt3q-073f6caf5b.json"
+            }
+            
+       
         firebase = pyrebase.initialize_app(config)
 
         return firebase
@@ -275,16 +266,20 @@ class uploader(threading.Thread):
         msg = "<- [TC1] %s" % cmd
         self.log.send(self.iam, INFO, msg)
 
-        if param[0] == HK_REQ_COM_STS:
-            self.hk_list[GEA_COM_TC1] = bool(int(param[1]))
-        
-        elif param[0] == HK_REQ_GETVALUE:
-            self.hk_list[GEA_BENCH] = float(param[1])
-            self.hk_list[GEA_GRATING] = float(param[2])
-            self.hk_list[GEA_BENCH_HEATING] = float(param[3])
-            self.hk_list[GEA_GRATING_HEATING] = float(param[4])
-            self.hk_list[GEA_BENCH_SP] = float(param[5])
-            self.hk_list[GEA_GRATING_SP] = float(param[6])
+        try:
+            if param[0] == HK_REQ_COM_STS:
+                self.hk_list[GEA_COM_TC1] = bool(int(param[1]))
+            
+            elif param[0] == HK_REQ_GETVALUE:
+                self.hk_list[GEA_BENCH] = float(param[1])
+                self.hk_list[GEA_GRATING] = float(param[2])
+                self.hk_list[GEA_BENCH_HEATING] = float(param[3])
+                self.hk_list[GEA_GRATING_HEATING] = float(param[4])
+                self.hk_list[GEA_BENCH_SP] = float(param[5])
+                self.hk_list[GEA_GRATING_SP] = float(param[6])
+                
+        except:
+            self.log.send(self.iam, WARNING, "parsing error")
                                     
             
     def callback_tmc2(self, ch, method, properties, body):
@@ -296,16 +291,20 @@ class uploader(threading.Thread):
         msg = "<- [TC2] %s" % cmd
         self.log.send(self.iam, INFO, msg)
 
-        if param[0] == HK_REQ_COM_STS:
-            self.hk_list[GEA_COM_TC2] = bool(int(param[1]))
+        try:
+            if param[0] == HK_REQ_COM_STS:
+                self.hk_list[GEA_COM_TC2] = bool(int(param[1]))
+            
+            elif param[0] == HK_REQ_GETVALUE:
+                self.hk_list[GEA_DETS] = float(param[1])
+                self.hk_list[GEA_DETK] = float(param[2])
+                self.hk_list[GEA_DETS_HEATING] = float(param[3])
+                self.hk_list[GEA_DETK_HEATING] = float(param[4])
+                self.hk_list[GEA_DETS_SP] = float(param[5])
+                self.hk_list[GEA_DETK_SP] = float(param[6])
         
-        elif param[0] == HK_REQ_GETVALUE:
-            self.hk_list[GEA_DETS] = float(param[1])
-            self.hk_list[GEA_DETK] = float(param[2])
-            self.hk_list[GEA_DETS_HEATING] = float(param[3])
-            self.hk_list[GEA_DETK_HEATING] = float(param[4])
-            self.hk_list[GEA_DETS_SP] = float(param[5])
-            self.hk_list[GEA_DETK_SP] = float(param[6])
+        except:
+            self.log.send(self.iam, WARNING, "parsing error")
                                 
         
     def callback_tmc3(self, ch, method, properties, body):
@@ -317,14 +316,18 @@ class uploader(threading.Thread):
         msg = "<- [TC3] %s" % cmd
         self.log.send(self.iam, INFO, msg)
         
-        if param[0] == HK_REQ_COM_STS:
-            self.hk_list[GEA_COM_TC3] = bool(int(param[1]))
-        
-        elif param[0] == HK_REQ_GETVALUE:
-            self.hk_list[GEA_CAMH] = float(param[1])
-            self.hk_list[GEA_DETH] = float(param[2])
-            self.hk_list[GEA_DETH_HEATING] = float(param[3])
-            self.hk_list[GEA_DETH_SP] = float(param[4])
+        try:
+            if param[0] == HK_REQ_COM_STS:
+                self.hk_list[GEA_COM_TC3] = bool(int(param[1]))
+            
+            elif param[0] == HK_REQ_GETVALUE:
+                self.hk_list[GEA_CAMH] = float(param[1])
+                self.hk_list[GEA_DETH] = float(param[2])
+                self.hk_list[GEA_DETH_HEATING] = float(param[3])
+                self.hk_list[GEA_DETH_SP] = float(param[4])
+                
+        except:
+            self.log.send(self.iam, WARNING, "parsing error")
             
                     
     
@@ -337,18 +340,22 @@ class uploader(threading.Thread):
         msg = "<- [TM] %s" % cmd
         self.log.send(self.iam, INFO, msg)
         
-        if param[0] == HK_REQ_COM_STS:
-            self.hk_list[GEA_COM_TM] = bool(int(param[1]))
-        
-        elif param[0] == HK_REQ_GETVALUE:
-            self.hk_list[GEA_BENCHCEN] = float(param[1])
-            self.hk_list[GEA_COLDHEAD1] = float(param[2])
-            self.hk_list[GEA_COLDHEAD2] = float(param[3])
-            self.hk_list[GEA_COLDSTOP] = float(param[4])
-            self.hk_list[GEA_CHARCOALBOX] = float(param[5])
-            self.hk_list[GEA_CAMK] = float(param[6])
-            self.hk_list[GEA_SHIELDTOP] = float(param[7])
-            self.hk_list[GEA_AIR] = float(param[8])
+        try:
+            if param[0] == HK_REQ_COM_STS:
+                self.hk_list[GEA_COM_TM] = bool(int(param[1]))
+            
+            elif param[0] == HK_REQ_GETVALUE:
+                self.hk_list[GEA_BENCHCEN] = float(param[1])
+                self.hk_list[GEA_COLDHEAD1] = float(param[2])
+                self.hk_list[GEA_COLDHEAD2] = float(param[3])
+                self.hk_list[GEA_COLDSTOP] = float(param[4])
+                self.hk_list[GEA_CHARCOALBOX] = float(param[5])
+                self.hk_list[GEA_CAMK] = float(param[6])
+                self.hk_list[GEA_SHIELDTOP] = float(param[7])
+                self.hk_list[GEA_AIR] = float(param[8])
+                
+        except:
+            self.log.send(self.iam, WARNING, "parsing error")
             
                             
        
@@ -361,17 +368,21 @@ class uploader(threading.Thread):
         msg = "<- [VM] %s" % cmd
         self.log.send(self.iam, INFO, msg)
 
-        if param[0] == HK_REQ_COM_STS:
-            self.hk_list[GEA_COM_VM] = bool(int(param[1]))
-        
-        elif param[0] == HK_REQ_GETVALUE:
-            dpvalue = ""
-            if len(param[1]) > 10 or param[1] == DEFAULT_VALUE:
-                dpvalue = float(DEFAULT_VALUE)
-            else:
-                dpvalue = float(param[1])
+        try:
+            if param[0] == HK_REQ_COM_STS:
+                self.hk_list[GEA_COM_VM] = bool(int(param[1]))
             
-            self.hk_list[GEA_VACUUM] = dpvalue
+            elif param[0] == HK_REQ_GETVALUE:
+                dpvalue = ""
+                if len(param[1]) > 10 or param[1] == DEFAULT_VALUE:
+                    dpvalue = float(DEFAULT_VALUE)
+                else:
+                    dpvalue = float(param[1])
+                
+                self.hk_list[GEA_VACUUM] = dpvalue
+                
+        except:
+            self.log.send(self.iam, WARNING, "parsing error")
             
             
         
@@ -382,12 +393,16 @@ class uploader(threading.Thread):
         msg = "<- [VM] %s" % cmd
         self.log.send(self.iam, INFO, msg)
         
-        if param[0] == HK_REQ_COM_STS:
-            self.hk_list[GEA_COM_PDU] = bool(int(param[1]))
+        try:
+            if param[0] == HK_REQ_COM_STS:
+                self.hk_list[GEA_COM_PDU] = bool(int(param[1]))
+            
+            elif param[1] == HK_REQ_PWR_STS:
+                for i in range(PDU_IDX):
+                    self.hk_list[GEA_PDU1_PWR+i] = bool(int(param[i+1]))
         
-        elif param[1] == HK_REQ_PWR_STS:
-            for i in range(PDU_IDX):
-                self.hk_list[GEA_PDU1_PWR+i] = bool(int(param[i+1]))
+        except:
+            self.log.send(self.iam, WARNING, "parsing error")
                                 
             
     def callback_hk(self, ch, method, properties, body):
@@ -399,13 +414,16 @@ class uploader(threading.Thread):
         msg = "<- [HKP] %s" % cmd
         self.log.send(self.iam, INFO, msg)
 
-        if param[0] == HK_REQ_UPLOAD_DB:
-            db = param[1:]
-            if self.simul:
-                print("uploaded virtual firebase database...")
-            else:
-                #from HKP
+        try:
+            if param[0] == HK_REQ_UPLOAD_DB:
+                db = param[1:]
+                if self.simul:
+                    print("uploaded virtual firebase database...")
+                
                 self.start_upload_to_firebase(db)
+                
+        except:
+            self.log.send(self.iam, WARNING, "parsing error")
                     
     '''            
     def judge_value(self, input):
