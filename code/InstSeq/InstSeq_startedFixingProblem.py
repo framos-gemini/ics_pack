@@ -28,6 +28,7 @@ import numpy as np
 import Libs.SetConfig as sc
 from Libs.MsgMiddleware import *
 from Libs.logger import *
+from HandleAction import HandleAction
 
 import FITSHD_v3 as LFHD
 
@@ -213,6 +214,8 @@ class Inst_Seq(threading.Thread):
             
             self.cur_action_id = reboot_action_id
             
+            self.lGiapiAction = {}
+
             self.reboot = False    
         
         # for test    
@@ -263,6 +266,7 @@ class Inst_Seq(threading.Thread):
         t = ti.time()
         try:
             self.cur_action_id = action_id  # check!!! whether integer or not
+
             print(f'########## callGiapi python function {action_id} - {seq_cmd} {activity} ##########')
             print([f"{str(k)} : {config.getValue(k)}" for k in config.getKeys()])
             
@@ -359,6 +363,7 @@ class Inst_Seq(threading.Thread):
             # ----------------------------------------------------
             # SequenceCommand.INIT    
             elif seq_cmd == giapi.command.SequenceCommand.INIT:
+                self.lGiapiAction[action_id] = HandleAction(t, [SVC, H, K])
                 if activity == giapi.command.Activity.PRESET:
                     self.log.send(self.iam, INFO, "SequenceCommand.INIT, Activity.PRESET")
                     
@@ -500,7 +505,7 @@ class Inst_Seq(threading.Thread):
                     print(offset_p, offset_q)
                     msg = "%s %s %s" % (INSTSEQ_PQ, offset_p, offset_q)
                     self.publish_to_queue(msg)
-                    #ti.sleep(0.1)
+                    ti.sleep(0.1)
                     if int(offset_p) == 0 and int(offset_q) > 0:    self.frame_mode = "A"
                     elif int(offset_p) == 0 and int(offset_q) < 0:  self.frame_mode = "B"
                     elif int(offset_p) == 0 and int(offset_q) == 0: self.frame_mode = "ON"
@@ -935,6 +940,9 @@ class Inst_Seq(threading.Thread):
             
     def dcs_data_processing_SVC(self, param):
         print(f'dcs_data_processing_SVC param: {param} self.cur_action_id: {self.cur_action_id} self.dcs_ready[SVC]: {self.dcs_ready[SVC]}')
+        if  self.cur_action_id in self.lGiapiAction:
+            self.lGiapiAction[self.cur_action_id].completed(SVC, ti.time())
+
         if param[0] == CMD_INITIALIZE1:
             msg = "%s %s %d" % (CMD_INIT2_DONE, self.dcs_list[SVC], self.simulation_mode)
             self.publish_to_queue(msg)    
@@ -944,7 +952,7 @@ class Inst_Seq(threading.Thread):
             # doesn't matter who did the action
                         
             self.dcs_ready[SVC] = True
-            
+
             if self.cur_action_id == 0: return  
 
             if self.rebooting[SVC]:
@@ -1121,7 +1129,7 @@ class Inst_Seq(threading.Thread):
         '''
         #if _t >= 0.300:
         #    print("postCompetionInfo")
-        ti.sleep(0.200)
+        # FR ti.sleep(1)
         if (self.cur_action_id != 0):
            print (f"time: {_t} response: {self.actRequested[self.cur_action_id]['response']} self.cur_action_id: {self.cur_action_id}")
            giapi.CommandUtil.postCompletionInfo(self.cur_action_id, giapi.HandlerResponse.create(self.actRequested[self.cur_action_id]['response']))      

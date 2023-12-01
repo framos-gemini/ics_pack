@@ -24,7 +24,7 @@ try:
     dir = sys.argv[0].split('/')
     WORKING_DIR = "/home/%s/" % dir[2]
 except:
-    WORKING_DIR = "/home/ics/"
+    WORKING_DIR = "/home/software/"
     
 MAIN = "MAIN"
 HK = "HK"

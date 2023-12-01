@@ -2,7 +2,7 @@
 
 export IGRINS_CONFIG=/IGRINS/TEST/Config/IGRINS.ini,/IGRINS/TEST/Config/IGRINS_test.ini
 
-PYTHONBIN=/home/ics/miniconda3/envs/igos2n/bin/python
+PYTHONBIN=/home/software/miniconda3/envs/igos2n/bin/python
 
 source ~/.bash_profile
 conda activate igos2n

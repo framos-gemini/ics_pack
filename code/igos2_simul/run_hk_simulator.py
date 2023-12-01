@@ -12,7 +12,8 @@ if __name__ == "__main__":
 
     #config_dir = sys.argv[1]
     #print(config_dir)
-    config_dir = "/home/ics/IGRINS/Config"
+    #config_dir = "/home/ics/IGRINS/Config"
+    config_dir = "/home/software/IGRINS/Config"
     
     # IGRINS.ini simulation->True
     ini_file = config_dir + "/IGRINS.ini"

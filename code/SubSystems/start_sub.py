@@ -37,6 +37,7 @@ class SubSystems():
         for i in range(len(self.com_list)-2):                        
             if 0 <= i <= TMC3:
                 cmd = "%s/temp_ctrl.py" % path
+                print (f'cmd: {cmd}')
                 self.proc_sub[i] = subprocess.Popen(['python', cmd, str(i+1)])
             elif i == TM or i == VM:
                 cmd = "%s/monitor.py" % path
